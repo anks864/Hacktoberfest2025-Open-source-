@@ -1,0 +1,45 @@
+int numberOfAlternatingGroups(int* colors, int colorsSize, int k) {
+    // Validate input
+    if (k < 3 || k > colorsSize) {
+        return 0; // Invalid k, return 0
+    }
+
+    // Precompute validity of adjacent pairs
+    int* valid = (int*)malloc(colorsSize * sizeof(int));
+    for (int i = 0; i < colorsSize; i++) {
+        int next = (i + 1) % colorsSize; // Circular array
+        valid[i] = (colors[i] != colors[next]) ? 1 : 0;
+    }
+
+    // Use sliding window to count valid groups
+    int nog = 0;
+    int windowValid = 0;
+
+    // Initialize the first window
+    for (int i = 0; i < k - 1; i++) {
+        windowValid += valid[i];
+    }
+
+    // Check if the first window is valid
+    if (windowValid == k - 1) {
+        nog++;
+    }
+
+    // Slide the window through the array
+    for (int i = 1; i < colorsSize; i++) {
+        // Remove the leftmost element of the previous window
+        windowValid -= valid[i - 1];
+        // Add the new rightmost element
+        int right = (i + k - 2) % colorsSize;
+        windowValid += valid[right];
+        // Check if the current window is valid
+        if (windowValid == k - 1) {
+            nog++;
+        }
+    }
+
+    // Free allocated memory
+    free(valid);
+
+    return nog;
+}
